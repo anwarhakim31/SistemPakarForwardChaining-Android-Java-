@@ -4,6 +4,7 @@ package com.example.catcare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,17 +27,20 @@ import android.widget.Toast;
 import android.widget.Button;
 
 
+
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class DiagnosisFragment extends Fragment {
     private ArrayList<CheckBox> checkBoxList = new ArrayList<>();
 
     private Button prosesButton;
-    private String username;
+    private String username, email;
 
     @Nullable
     @Override
@@ -53,7 +57,7 @@ public class DiagnosisFragment extends Fragment {
         LinearLayout cardContainer = view.findViewById(R.id.cardContainer);
         cardContainer.removeAllViews();
 
-        cardContainer.setPadding(20, 80, 20, 150);
+        cardContainer.setPadding(20, 80, 20, 130);
 
         TextView titleTextView = new TextView(requireContext());
         LinearLayout.LayoutParams titleLayoutParams = new LinearLayout.LayoutParams(
@@ -118,7 +122,11 @@ public class DiagnosisFragment extends Fragment {
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("gejala");
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+
+
+
+        Query query = databaseReference.orderByChild("id_gejala");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -175,6 +183,7 @@ public class DiagnosisFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             username = args.getString("username");
+            email = args.getString("email");
         }
 
 
@@ -203,8 +212,9 @@ public class DiagnosisFragment extends Fragment {
                     Intent intent = new Intent(requireContext(), Hasil_Diagnosa.class);
                     intent.putExtra("HASIL", gejalaTerpilih.toString());
                     intent.putExtra("username", username);
+                    intent.putExtra("email", email);
                     startActivity(intent);
-
+                    getActivity().finish();
                 }
             }
         });
